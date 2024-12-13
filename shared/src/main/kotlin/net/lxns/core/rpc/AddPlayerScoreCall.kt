@@ -7,5 +7,5 @@ import net.lxns.core.record.PlayerScoreRecord
 @Serializable
 class AddPlayerScoreCall(
     val record: PlayerScoreRecord,
-    override val id: Int
-) : RemoteCall
+    override var id: Int
+) : RemoteCall<Nothing>

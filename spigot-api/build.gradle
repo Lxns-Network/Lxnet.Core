@@ -1,0 +1,4 @@
+dependencies {
+    api project(":shared")
+    compileOnly libs.spigot.api
+}

@@ -5,3 +5,4 @@ rootProject.name = 'LxnetCore'
 
 include 'velocity'
 include 'shared'
+include 'spigot-api'

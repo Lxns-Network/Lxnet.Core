@@ -2,6 +2,6 @@ package net.lxns.core
 
 const val RPC_CHANNEL_IDENTIFIER = "lxnet:server"
 
-interface RemoteCall {
-    val id: Int
+interface RemoteCall<R> {
+    var id: Int
 }
