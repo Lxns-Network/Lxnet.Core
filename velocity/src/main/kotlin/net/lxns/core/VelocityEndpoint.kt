@@ -62,6 +62,7 @@ class VelocityEndpoint(
                 ?: throw IllegalStateException("config.yml is invalid")
         } else {
             return LxnetConfig().also {
+                config = it
                 val node = configLoader.build().createNode().set(config)
                 configLoader.buildAndSaveString(node);
                 logger.info("Default config created.")
@@ -75,7 +76,7 @@ class VelocityEndpoint(
         if (event.identifier != rpcChannelIdentifier) return
         if (event.source !is ServerConnection) return
         event.result = PluginMessageEvent.ForwardResult.handled()
-        val globalEvent = Json.decodeFromStream<RemoteCall>(event.dataAsInputStream())
+        val globalEvent = Json.decodeFromStream<RemoteCall<*>>(event.dataAsInputStream())
         proxyServer.eventManager.fireAndForget(RemoteCallEvent(
             globalEvent,
             (event.source as ServerConnection).server

@@ -2,6 +2,9 @@ repositories {
     maven {
         url = "https://repo.andrei1058.dev/releases/"
     }
+    maven {
+        url = 'https://repo.codemc.io/repository/nms-local/'
+    }
 }
 
 dependencies {
