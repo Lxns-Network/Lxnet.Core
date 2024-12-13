@@ -25,7 +25,7 @@ class RpcManager {
         }
         call.id = callIndex.getAndIncrement()
         Bukkit.getServer().onlinePlayers.first().sendPluginMessage(
-            LxnetCorePlugin.bukkitPlugin,
+            LxnetCore.bukkitPlugin,
             RPC_CHANNEL_IDENTIFIER,
             Json.encodeToString(call).encodeToByteArray()
         )

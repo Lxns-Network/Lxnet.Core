@@ -1,0 +1,11 @@
+score:
+  kill: 4
+  final-kill: 10
+  not-pvp-multiplier: 0.7
+  break-bed: 15
+  winner: 50
+
+lang:
+  kill: "&a杀死敌人! ( +%d 积分 )"
+  break-bed: "&a破坏床！( +%d 积分 )"
+  win: "&6&l游戏胜利! &7( +50 积分)"

@@ -3,7 +3,7 @@ package net.lxns.core
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.logging.Logger
 
-class LxnetCorePlugin : JavaPlugin() {
+class LxnetCore : JavaPlugin() {
     companion object {
         lateinit var logger: Logger
             private set
@@ -14,7 +14,7 @@ class LxnetCorePlugin : JavaPlugin() {
     }
     override fun onEnable() {
         logger.info("Loading")
-        LxnetCorePlugin.logger = this.logger
+        LxnetCore.logger = this.logger
         bukkitPlugin = this
         rpcManager = RpcManager()
         server.messenger.registerIncomingPluginChannel(this, RPC_CHANNEL_IDENTIFIER, ChannelListener(rpcManager))

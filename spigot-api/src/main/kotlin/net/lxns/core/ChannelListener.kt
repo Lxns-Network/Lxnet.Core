@@ -14,7 +14,7 @@ class ChannelListener(
         if(channel != RPC_CHANNEL_IDENTIFIER) return
         val call = Json.decodeFromStream<RemoteCall<*>>(ByteArrayInputStream(message))
         val handler = rpcManager.getCallHandler(call.id) as? ResponseHandler<Any> ?: run {
-            LxnetCorePlugin.logger.warning("No rpc handler is correspond to id ${call.id}")
+            LxnetCore.logger.warning("No rpc handler is correspond to id ${call.id}")
             return
         }
         handler.onResponse(call)

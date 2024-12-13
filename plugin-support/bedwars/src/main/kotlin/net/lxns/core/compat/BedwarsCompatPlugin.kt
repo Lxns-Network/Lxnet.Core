@@ -3,48 +3,52 @@ package net.lxns.core.compat
 import com.andrei1058.bedwars.api.events.gameplay.GameEndEvent
 import com.andrei1058.bedwars.api.events.player.PlayerBedBreakEvent
 import com.andrei1058.bedwars.api.events.player.PlayerKillEvent
-import net.lxns.core.LxnetCorePlugin
+import net.lxns.core.LxnetCore
 import net.lxns.core.ScoreReason
 import net.lxns.core.record.PlayerScoreRecord
 import net.lxns.core.rpc.AddPlayerScoreCall
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 
 class BedwarsCompatPlugin : JavaPlugin(), Listener {
     override fun onEnable() {
+        if(!dataFolder.exists())
+            dataFolder.mkdir()
+        saveDefaultConfig()
+        reloadConfig()
         Bukkit.getPluginManager().registerEvents(this, this)
     }
 
     @EventHandler
     fun onPlayerKill(event: PlayerKillEvent) {
         val killer = event.killer
-        var score = if (event.cause.isFinalKill) 10.0 else 4.0
+        var score = if (event.cause.isFinalKill) config.getInt("score.final-kill") else config.getInt("score.kill")
         if (!event.cause.name.contains("PVP")) {
-            score = score * 0.7
+            score = (score * config.getDouble("score.not-pvp-multiplier")).toInt()
         }
-        LxnetCorePlugin.rpcManager.requestCall(
+        LxnetCore.rpcManager.requestCall(
             AddPlayerScoreCall(
                 PlayerScoreRecord(
                     killer.uniqueId,
-                    score.toInt(),
+                    score,
                     ScoreReason.KILL_ENEMY
                 )
             )
         )
-        killer.sendMessage("&a杀死敌人! ( +$score 积分 )".bukkitColor())
+        killer.sendMessage(config.getString("lang.kill")!!.format(score).bukkitColor())
     }
 
     @EventHandler
     fun onBedBreak(event: PlayerBedBreakEvent){
         val p = event.player
-        p.sendMessage("&a破坏床！( +15 积分 )".bukkitColor())
-        LxnetCorePlugin.rpcManager.requestCall(
+        val scoreBed = config.getInt("score.break-bed")
+        p.sendMessage(config.getString("lang.break-bed")!!.format(scoreBed).bukkitColor())
+        LxnetCore.rpcManager.requestCall(
             AddPlayerScoreCall(
                 PlayerScoreRecord(
-                    p.uniqueId, 15, ScoreReason.OTHER
+                    p.uniqueId, scoreBed, ScoreReason.OTHER
                 )
             )
         )
@@ -52,17 +56,18 @@ class BedwarsCompatPlugin : JavaPlugin(), Listener {
 
     @EventHandler
     fun onGameEnd(event: GameEndEvent) {
+        val score = config.getInt("score.winner")
         for (winner in event.winners) {
-            LxnetCorePlugin.rpcManager.requestCall(
+            LxnetCore.rpcManager.requestCall(
                 AddPlayerScoreCall(
                     PlayerScoreRecord(
                         player = winner,
-                        score = 50,
+                        score = score,
                         reason = ScoreReason.GAME_WINNER
                     )
                 )
             )
-            Bukkit.getPlayer(winner)?.sendMessage("&6&l游戏胜利! &7( +50 积分)".bukkitColor())
+            Bukkit.getPlayer(winner)?.sendMessage(config.getString("lang.win")!!.format(score).bukkitColor())
         }
     }
 }
