@@ -8,7 +8,7 @@ import java.util.UUID
 @Serializable
 class FetchPlayerScoreCall(
     val player: @Serializable(UUIDSerializer::class) UUID,
-    override var id: Int
+    override var id: Int = 0
 ) : RemoteCall<FetchPlayerScoreCall.Response>{
     @Serializable
     class Response (

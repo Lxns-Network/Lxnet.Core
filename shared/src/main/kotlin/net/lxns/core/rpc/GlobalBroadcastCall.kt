@@ -9,5 +9,5 @@ import net.lxns.core.serializers.ComponentSerializer
 class GlobalBroadcastCall(
     @Serializable(ComponentSerializer::class)
     val message: Component,
-    override var id: Int
+    override var id: Int = 0
 ) : RemoteCall<Nothing>
