@@ -1,0 +1,36 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version '2.0.20'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '2.0.20'
+}
+
+allprojects {
+    apply plugin: 'org.jetbrains.kotlin.jvm'
+    apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
+    group = 'net.lxns'
+    version = '1.0-SNAPSHOT'
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven {
+            url = "https://repo.papermc.io/repository/maven-public/"
+        }
+        maven {
+            name = 'spigotmc-repo'
+            url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+        }
+        maven {
+            name = 'sonatype'
+            url = 'https://oss.sonatype.org/content/groups/public/'
+        }
+    }
+    dependencies {
+        implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3"
+    }
+    test {
+        useJUnitPlatform()
+    }
+    kotlin {
+        jvmToolchain(21)
+    }
+}
