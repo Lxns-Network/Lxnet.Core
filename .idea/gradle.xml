@@ -9,6 +9,8 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/plugin-support" />
+            <option value="$PROJECT_DIR$/plugin-support/bedwars" />
             <option value="$PROJECT_DIR$/shared" />
             <option value="$PROJECT_DIR$/spigot-api" />
             <option value="$PROJECT_DIR$/velocity" />

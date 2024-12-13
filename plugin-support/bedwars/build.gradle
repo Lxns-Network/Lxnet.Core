@@ -1,0 +1,11 @@
+repositories {
+    maven {
+        url = "https://repo.andrei1058.dev/releases/"
+    }
+}
+
+dependencies {
+    compileOnly libs.spigot.api
+    compileOnly project(":spigot-api")
+    implementation 'com.andrei1058.bedwars:bedwars-api:24.9'
+}
