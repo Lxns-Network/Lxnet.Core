@@ -1,0 +1,3 @@
+name: Lxnet.Core
+main: net.lxns.core.LxnetCore
+version: 0.1.0

@@ -1,0 +1,3 @@
+move-threshold: 5
+score-per-threshold: 7
+message: "&a游玩跑酷游戏 ( +%d 硬币 )"

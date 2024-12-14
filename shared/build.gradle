@@ -1,5 +1,5 @@
 
 dependencies {
     compileOnly libs.adventure
-    api libs.adventure.mm
+    compileOnly libs.adventure.mm
 }

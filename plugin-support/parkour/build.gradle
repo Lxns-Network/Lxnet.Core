@@ -1,0 +1,5 @@
+
+dependencies {
+    compileOnly libs.paper.api
+    compileOnly project(":paper-common")
+}

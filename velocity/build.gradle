@@ -1,6 +1,7 @@
+apply plugin: 'org.jetbrains.kotlin.kapt'
 
 dependencies {
     compileOnly libs.velocity
-    annotationProcessor libs.velocity
+    kapt libs.velocity.kapt
     implementation project(":shared")
 }

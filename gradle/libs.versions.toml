@@ -1,10 +1,11 @@
 [libraries]
-spigot-api = { group = "org.spigotmc", name = "spigot-api", version.ref = "spigot-api-current" }
+paper-api = { group = "io.papermc.paper", name = "paper-api", version.ref = "paper-api-current" }
 velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
+velocity-kapt = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 adventure = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
 adventure-mm = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
 
 [versions]
-spigot-api-current = "1.21-R0.1-SNAPSHOT"
+paper-api-current = "1.21.4-R0.1-SNAPSHOT"
 velocity = "3.4.0-SNAPSHOT"
 adventure = "4.17.0"

@@ -5,6 +5,7 @@ import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.PluginMessageEvent
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
 import com.velocitypowered.api.plugin.Plugin
+import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.proxy.ServerConnection
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier
@@ -26,10 +27,10 @@ import kotlin.io.path.readText
     name = "LxnetCore",
     version = "0.1.0"
 )
-class VelocityEndpoint(
-    @Inject private val proxyServer: ProxyServer,
-    @Inject private val dataDir: Path,
-    @Inject private val logger: Logger
+class VelocityEndpoint @Inject constructor(
+    private val proxyServer: ProxyServer,
+    @DataDirectory private val dataDir: Path,
+    private val logger: Logger
 ) {
     companion object {
         val rpcChannelIdentifier = MinecraftChannelIdentifier.from(RPC_CHANNEL_IDENTIFIER)
@@ -76,7 +77,7 @@ class VelocityEndpoint(
         if (event.identifier != rpcChannelIdentifier) return
         if (event.source !is ServerConnection) return
         event.result = PluginMessageEvent.ForwardResult.handled()
-        val globalEvent = Json.decodeFromStream<RemoteCall<*>>(event.dataAsInputStream())
+        val globalEvent = lxNetFormat.decodeFromStream<RemoteCall<*>>(event.dataAsInputStream())
         proxyServer.eventManager.fireAndForget(RemoteCallEvent(
             globalEvent,
             (event.source as ServerConnection).server

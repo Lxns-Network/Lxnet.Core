@@ -1,6 +1,7 @@
 package net.lxns.core.rpc
 
 import kotlinx.serialization.Serializable
+import net.lxns.core.Nothing
 import net.lxns.core.RemoteCall
 import net.lxns.core.record.PlayerScoreRecord
 

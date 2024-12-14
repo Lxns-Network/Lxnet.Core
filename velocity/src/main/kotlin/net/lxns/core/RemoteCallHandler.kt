@@ -2,12 +2,14 @@ package net.lxns.core
 
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.proxy.ProxyServer
+import com.velocitypowered.api.proxy.server.RegisteredServer
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.lxns.core.event.RemoteCallEvent
 import net.lxns.core.rpc.GlobalBroadcastCall
 import net.lxns.core.rpc.AddPlayerScoreCall
 import net.lxns.core.rpc.FetchPlayerScoreCall
+import net.lxns.core.rpc.RaisePlayerCall
 
 class RemoteCallHandler(val server: ProxyServer) {
     @Subscribe
@@ -18,12 +20,23 @@ class RemoteCallHandler(val server: ProxyServer) {
                     player.sendMessage(event.call.message)
                 }
             }
-
-            is AddPlayerScoreCall -> {
-                VelocityEndpoint.dataSource.addPlayerScore(event.call.record)
-            }
-
+            is AddPlayerScoreCall -> VelocityEndpoint.dataSource.addPlayerScore(event.call.record)
             is FetchPlayerScoreCall -> onFetchPlayerScore(event as RemoteCallEvent<FetchPlayerScoreCall>)
+            is RaisePlayerCall -> onRaisingPlayer(event as RemoteCallEvent<RaisePlayerCall>, event.server)
+        }
+    }
+
+    private fun onRaisingPlayer(
+        event: RemoteCallEvent<RaisePlayerCall>,
+        from: RegisteredServer
+    ) {
+        for (registeredServer in server.allServers) {
+            if(registeredServer != from){
+                registeredServer.sendPluginMessage(
+                    VelocityEndpoint.rpcChannelIdentifier,
+                    Json.encodeToString(event).encodeToByteArray()
+                )
+            }
         }
     }
 
@@ -32,6 +45,9 @@ class RemoteCallHandler(val server: ProxyServer) {
         val player = event.call.player
         val score = VelocityEndpoint.dataSource.getPlayerScore(player)
         val resp = FetchPlayerScoreCall.Response(score, id)
-        event.server.sendPluginMessage(VelocityEndpoint.rpcChannelIdentifier, Json.encodeToString(resp).toByteArray())
+        event.server.sendPluginMessage(
+            VelocityEndpoint.rpcChannelIdentifier,
+            Json.encodeToString(resp).encodeToByteArray()
+        )
     }
 }

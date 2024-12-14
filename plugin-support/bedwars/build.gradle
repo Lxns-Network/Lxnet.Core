@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly libs.spigot.api
-    compileOnly project(":spigot-api")
+    compileOnly libs.paper.api
+    compileOnly project(":paper-common")
     implementation 'com.andrei1058.bedwars:bedwars-api:24.9'
 }

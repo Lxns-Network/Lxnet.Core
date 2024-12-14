@@ -2,6 +2,7 @@ package net.lxns.core.rpc
 
 import kotlinx.serialization.Serializable
 import net.lxns.core.RemoteCall
+import net.lxns.core.RemoteResponse
 import net.lxns.core.serializers.UUIDSerializer
 import java.util.UUID
 
@@ -14,5 +15,5 @@ class FetchPlayerScoreCall(
     class Response (
         val score: Int,
         override var id: Int
-    ): RemoteCall<Nothing>
+    ): RemoteResponse
 }
