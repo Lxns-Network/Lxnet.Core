@@ -12,11 +12,16 @@ class ChannelListener(
 ) : PluginMessageListener {
     override fun onPluginMessageReceived(channel: String, player: Player, message: ByteArray?) {
         if(channel != RPC_CHANNEL_IDENTIFIER) return
-        val call = Json.decodeFromStream<RemoteCall<*>>(ByteArrayInputStream(message))
-        val handler = rpcManager.getCallHandler(call.id) as? ResponseHandler<Any> ?: run {
-            LxnetCore.logger.warning("No rpc handler is correspond to id ${call.id}")
-            return
+        val call = lxNetFormat.decodeFromStream<RemoteCall<RemoteResponse>>(ByteArrayInputStream(message))
+        for (handler in rpcManager.listeners) {
+            (handler as ResponseHandler<Any>).onResponse(call)
         }
-        handler.onResponse(call)
+        if(call.id != -1){
+            val handler = rpcManager.getAndRevokeCallHandler(call.id) as? ResponseHandler<Any> ?: run {
+                LxnetCore.logger.warning("No rpc handler is correspond to id ${call.id}")
+                return
+            }
+            handler.onResponse(call)
+        }
     }
 }

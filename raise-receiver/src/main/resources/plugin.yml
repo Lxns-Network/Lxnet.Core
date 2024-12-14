@@ -2,3 +2,4 @@ name: RaiseReceiver
 main: net.lxns.core.RaiseReceiverPlugin
 version: 0.1.0
 depend: [Lxnet.Core]
+api-version: 1.20

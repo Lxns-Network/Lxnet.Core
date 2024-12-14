@@ -1,6 +1,8 @@
 package net.lxns.core.task
 
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.lxns.core.LxnetCore
+import net.lxns.core.ParkourCompat
 import net.lxns.core.ScoreReason
 import net.lxns.core.bukkitColor
 import net.lxns.core.record.PlayerScoreRecord
@@ -12,40 +14,25 @@ import org.bukkit.entity.Player
 import org.bukkit.scheduler.BukkitRunnable
 import java.util.UUID
 import kotlin.math.abs
+import kotlin.math.max
 
 class TipPlayerTask(
-    private val moveThreshold: Int,
-    private val score: Int,
+    private val plugin: ParkourCompat,
     private val message: String
 ): BukkitRunnable() {
-    private val yCounter = mutableMapOf<UUID, Int>()
     override fun run() {
-        for (player in Bukkit.getOnlinePlayers()) {
-            val current = player.location.y.toInt()
-            if(yCounter.contains(player.uniqueId)) {
-                handlePlayer(player,current)
-            }else{
-                yCounter[player.uniqueId] = current
-            }
-        }
-    }
-
-    private fun handlePlayer(player: Player, currentY: Int){
-        val lastY = yCounter[player.uniqueId]
-        val delta = currentY - lastY!!
-        if(delta < moveThreshold) return
-        yCounter[player.uniqueId] = currentY
-        // tip
-        val score = score * delta / moveThreshold
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacy(message.format(score)))
-        LxnetCore.rpcManager.requestCall(
-            AddPlayerScoreCall(
-                PlayerScoreRecord(
-                    player.uniqueId,
-                    score,
-                    ScoreReason.PLAYING_GAME
+        for ((id, score) in plugin.playerScores) {
+            val player = Bukkit.getPlayer(id) ?: continue
+            player.sendMessage(MiniMessage.miniMessage().deserialize(message.format(score.toInt())))
+            LxnetCore.rpcManager.requestCall(
+                AddPlayerScoreCall(
+                    PlayerScoreRecord(
+                        player.uniqueId,
+                        score.toInt(),
+                        ScoreReason.PLAYING_GAME
+                    )
                 )
             )
-        )
+        }
     }
 }

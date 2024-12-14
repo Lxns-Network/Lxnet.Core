@@ -9,4 +9,4 @@ lang:
   kill: "&a杀死敌人! ( +%d 硬币 )"
   break-bed: "&a破坏床！( +%d 硬币 )"
   win: "&6&l游戏胜利! &7( +50 硬币 )"
-  raise-player: " <click:run_command:'/server bedwars'><red><bold>游戏招募 >> </red></bold><aqua>起床战争</aqua> <white>小游戏即将开始，点击此处加入游戏！</white></click>"
+  raise-player: " <click:run_command:'/server bedwars'><red><bold>游戏招募 >> </red><aqua>起床战争</aqua> <white>小游戏即将开始，点击此处加入游戏！</white></click>"

@@ -1,22 +1,37 @@
 package net.lxns.core
 
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import net.lxns.core.rpc.ResponseHandler
 import org.bukkit.Bukkit
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.reflect.KClass
 
 class RpcManager {
     private val callIndex = AtomicInteger()
-    private val responseHandlers = ConcurrentHashMap<Int, ResponseHandler<*>>()
+    private val pendingCallHandlers = ConcurrentHashMap<Int, ResponseHandler<*>>()
+    internal val listeners = mutableListOf<ResponseHandler<*>>()
 
     fun <R> registerCallHandler(id: Int, handler: ResponseHandler<R>) {
-        responseHandlers[id] = handler
+        pendingCallHandlers[id] = handler
+    }
+
+    fun <R> registerListener(clazz: Class<*>, handler: ResponseHandler<R>) {
+        listeners.add {
+            if(clazz.isInstance(it)) handler.onResponse(it as R)
+        }
+    }
+
+    inline fun <reified R> registerListener(handler: ResponseHandler<R>) {
+        registerListener(R::class.java, handler)
+    }
+
+    fun getAndRevokeCallHandler(id: Int): ResponseHandler<*>? {
+        return pendingCallHandlers[id].also { pendingCallHandlers.remove(id) }
     }
 
     fun getCallHandler(id: Int): ResponseHandler<*>? {
-        return responseHandlers[id]
+        return pendingCallHandlers[id]
     }
 
     fun requestCall(call: RemoteCall<out RemoteResponse>){

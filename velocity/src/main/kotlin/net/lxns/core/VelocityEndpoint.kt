@@ -77,7 +77,7 @@ class VelocityEndpoint @Inject constructor(
         if (event.identifier != rpcChannelIdentifier) return
         if (event.source !is ServerConnection) return
         event.result = PluginMessageEvent.ForwardResult.handled()
-        val globalEvent = lxNetFormat.decodeFromStream<RemoteCall<*>>(event.dataAsInputStream())
+        val globalEvent = lxNetFormat.decodeFromStream<RemoteCall<RemoteResponse>>(event.dataAsInputStream())
         proxyServer.eventManager.fireAndForget(RemoteCallEvent(
             globalEvent,
             (event.source as ServerConnection).server

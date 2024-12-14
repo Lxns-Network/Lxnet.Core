@@ -2,3 +2,4 @@ name: BlockHuntCompat
 main: net.lxns.core.BlockHuntCompat
 version: 0.1.0
 depend: [Lxnet.Core, KenshinsHideAndSeek]
+api-version: 1.21

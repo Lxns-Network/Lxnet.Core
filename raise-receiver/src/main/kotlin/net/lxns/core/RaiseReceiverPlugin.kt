@@ -10,23 +10,12 @@ import org.bukkit.plugin.java.JavaPlugin
 import org.bukkit.plugin.messaging.PluginMessageListener
 import java.io.ByteArrayInputStream
 
-class RaiseReceiverPlugin : JavaPlugin(), PluginMessageListener {
+class RaiseReceiverPlugin : JavaPlugin(){
     override fun onEnable() {
-        server.messenger.registerIncomingPluginChannel(this, RPC_CHANNEL_IDENTIFIER, this)
-    }
-
-    override fun onPluginMessageReceived(
-        channel: String,
-        player: Player,
-        message: ByteArray
-    ) {
-        if (channel != RPC_CHANNEL_IDENTIFIER) return
-        val message = Json.decodeFromStream<RemoteCall<*>>(ByteArrayInputStream(message))
-        if (message !is RaisePlayerCall) {
-            return
-        }
-        for (player in Bukkit.getOnlinePlayers()) {
-            player.sendMessage(message.message)
+        LxnetCore.rpcManager.registerListener<RaisePlayerCall>{
+            for (player in Bukkit.getOnlinePlayers()) {
+                player.sendMessage(it.message)
+            }
         }
     }
 }

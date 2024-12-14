@@ -11,7 +11,7 @@ broadcast:
   player-at-most: 6
 
 lang:
-  raise-player: " <click:run_command:'/server blockhunt'><red><bold>游戏招募 >> </red></bold><aqua>躲猫猫</aqua> <white>小游戏即将开始，点击此处加入游戏！</white></click>"
+  raise-player: " <click:run_command:'/server blockhunt'><red><bold>游戏招募 >> </red><aqua>躲猫猫</aqua> <white>小游戏即将开始，点击此处加入游戏！</white></click>"
   kill-block: "&a你杀死了一个方块! ( +%d 硬币 )"
   kill-seeker: "&a你杀死了一个猎人! ( +%d 硬币 )"
   winner: "&6&l赢得游戏！( +%d 硬币 )"

@@ -4,6 +4,7 @@ import dev.tylerm.khs.Main
 import dev.tylerm.khs.event.GameEndEvent
 import dev.tylerm.khs.event.PlayerKillEvent
 import dev.tylerm.khs.event.StartTimerUpdateEvent
+import dev.tylerm.khs.game.util.Status.STANDBY
 import dev.tylerm.khs.game.util.WinType
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -33,6 +34,11 @@ class BlockHuntCompat : JavaPlugin(), Listener {
         ).runTaskTimer(this,0,10*20L)
         RaisePlayerTask(raiseMessage)
             .runTaskTimer(this,0,20L)
+        LxnetCore.rpcManager.registerListener<RaisePlayerCall> {
+            if(Main.getInstance().game.status == STANDBY) {
+                Bukkit.broadcast(it.message)
+            }
+        }
     }
 
     @EventHandler

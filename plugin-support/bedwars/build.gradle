@@ -10,5 +10,5 @@ repositories {
 dependencies {
     compileOnly libs.paper.api
     compileOnly project(":paper-common")
-    implementation 'com.andrei1058.bedwars:bedwars-api:24.9'
+    compileOnly 'com.andrei1058.bedwars:bedwars-api:24.9'
 }

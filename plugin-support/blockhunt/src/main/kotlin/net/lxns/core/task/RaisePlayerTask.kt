@@ -22,10 +22,10 @@ class RaisePlayerTask(
             if(System.currentTimeMillis() - time > 20 * 1000){
                 LxnetCore.rpcManager.requestCall(
                     RaisePlayerCall(
-                        message
+                        message,
+                        -1
                     )
                 )
-                Bukkit.broadcastMessage("test")
                 time = System.currentTimeMillis()
             }
         }

@@ -18,6 +18,6 @@ class LxnetCore : JavaPlugin() {
         bukkitPlugin = this
         rpcManager = RpcManager()
         server.messenger.registerIncomingPluginChannel(this, RPC_CHANNEL_IDENTIFIER, ChannelListener(rpcManager))
-
+        server.messenger.registerOutgoingPluginChannel(this, RPC_CHANNEL_IDENTIFIER)
     }
 }

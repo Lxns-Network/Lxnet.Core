@@ -2,3 +2,4 @@ name: BedwarsCompat
 main: net.lxns.core.compat.BedwarsCompatPlugin
 version: 0.1.0
 depend: [Lxnet.Core, BedWars1058]
+api-version: 1.20
