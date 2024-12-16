@@ -1,6 +1,7 @@
 package net.lxns.core
 
 import com.google.inject.Inject
+import com.velocitypowered.api.command.CommandMeta
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.PluginMessageEvent
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
@@ -49,6 +50,8 @@ class VelocityEndpoint @Inject constructor(
         dataSource = loadDataSource()
         proxyServer.channelRegistrar.register(rpcChannelIdentifier)
         proxyServer.eventManager.register(this, RemoteCallHandler(proxyServer))
+        registerShoutCommand(this, proxyServer)
+        registerLobbyCommand(this, proxyServer)
     }
 
     private fun loadDataSource(): DataSource {

@@ -6,8 +6,8 @@ plugins {
 }
 
 allprojects {
+    if(project.name.equals("plugin-support")) return
     apply plugin: 'org.jetbrains.kotlin.jvm'
-    apply plugin: 'org.jetbrains.kotlin.kapt'
     apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
     apply plugin: 'com.gradleup.shadow'
     group = 'net.lxns'
