@@ -1,0 +1,10 @@
+repositories {
+    mavenLocal()
+    maven { url = "https://maven.plugily.xyz/releases" }
+}
+
+dependencies {
+    compileOnly "plugily.projects:buildbattle:5.0.13-LXNET"
+    compileOnly libs.paper.api
+    compileOnly project(":paper-common")
+}

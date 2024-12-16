@@ -1,0 +1,12 @@
+bonus:
+  first: 10
+  second: 6
+  third: 4
+
+score:
+  guess-right: 6
+  guess-builder-per-answer: 3
+
+messages:
+  guess-right: "&a游玩建筑猜猜乐 (+%d 硬币)"
+  build-right: "&a玩家猜对了你的建筑 (+%d 硬币)"
