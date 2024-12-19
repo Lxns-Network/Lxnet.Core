@@ -1,4 +1,11 @@
 dependencies {
     api project(":shared")
     compileOnly libs.paper.api
+    implementation libs.aikar.commands
+    compileOnly libs.placeholderapi
+}
+
+shadowJar {
+    relocate 'co.aikar.commands', 'net.lxns.relocation.acf'
+    relocate 'co.aikar.locales', 'net.lxns.relocation.locales'
 }

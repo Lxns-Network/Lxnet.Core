@@ -2,3 +2,8 @@ name: Lxnet.Core
 main: net.lxns.core.LxnetCore
 version: 0.1.0
 api-version: 1.20
+softdepend:
+  - PlaceholderAPI
+commands:
+  coin:
+    description: Commands about coins

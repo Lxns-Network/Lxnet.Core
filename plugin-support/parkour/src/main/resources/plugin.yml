@@ -3,3 +3,6 @@ version: 0.1.0
 main: net.lxns.core.ParkourCompat
 depend: [Lxnet.Core]
 api-version: 1.21
+commands:
+  reward:
+    description: "who knows?"

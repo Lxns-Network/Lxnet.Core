@@ -1,21 +1,22 @@
 package net.lxns.core
 
 import com.google.inject.Inject
-import com.velocitypowered.api.command.CommandMeta
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.PluginMessageEvent
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
+import com.velocitypowered.api.event.proxy.ProxyShutdownEvent
 import com.velocitypowered.api.plugin.Plugin
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.proxy.ServerConnection
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 import net.lxns.core.dal.DataSource
 import net.lxns.core.dal.impl.InMemDataSource
+import net.lxns.core.dal.impl.SQLDataSource
 import net.lxns.core.event.RemoteCallEvent
+import org.jetbrains.exposed.sql.Database
 import org.slf4j.Logger
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.nio.file.Files
@@ -53,9 +54,11 @@ class VelocityEndpoint @Inject constructor(
         registerShoutCommand(this, proxyServer)
         registerLobbyCommand(this, proxyServer)
     }
-
+    @Subscribe
+    fun onFini(event: ProxyShutdownEvent){
+    }
     private fun loadDataSource(): DataSource {
-        return InMemDataSource()
+        return SQLDataSource(Database.connect("jdbc:sqlite:${dataDir}/scores.db"))
     }
 
     private fun loadConfig(): LxnetConfig {

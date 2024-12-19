@@ -1,3 +1,4 @@
 message: "<green>游玩跑酷游戏 ( +%d 硬币 )"
 
 score-initial: 2
+score-win: 1000

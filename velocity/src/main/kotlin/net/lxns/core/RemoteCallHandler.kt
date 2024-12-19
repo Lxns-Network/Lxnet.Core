@@ -11,6 +11,8 @@ import net.lxns.core.rpc.GlobalBroadcastCall
 import net.lxns.core.rpc.AddPlayerScoreCall
 import net.lxns.core.rpc.FetchPlayerScoreCall
 import net.lxns.core.rpc.RaisePlayerCall
+import net.lxns.core.rpc.SendMessageCall
+import kotlin.jvm.optionals.getOrNull
 
 class RemoteCallHandler(val server: ProxyServer) {
     @Subscribe
@@ -24,6 +26,7 @@ class RemoteCallHandler(val server: ProxyServer) {
             is AddPlayerScoreCall -> VelocityEndpoint.dataSource.addPlayerScore(event.call.record)
             is FetchPlayerScoreCall -> onFetchPlayerScore(event as RemoteCallEvent<FetchPlayerScoreCall>)
             is RaisePlayerCall -> onRaisingPlayer(event as RemoteCallEvent<RaisePlayerCall>, event.server)
+            is SendMessageCall -> server.getPlayer(event.call.player).getOrNull()?.sendMessage(event.call.message)
         }
     }
 

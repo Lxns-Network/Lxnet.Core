@@ -20,7 +20,7 @@ internal fun registerShoutCommand(plugin: VelocityEndpoint, proxyServer: ProxySe
                         else -> throw AssertionError("IMPOSSIBLE")
                     }
                     val message = MiniMessage.miniMessage().deserialize(
-                        "<green>[SHOUT]</green> ${name}: ${ctx.arguments.getValue("message")}",
+                        "<green>[SHOUT]</green> ${name}: ${ctx.getArgument<String>("message", String::class.java)}",
                     )
                     proxyServer.allPlayers.forEach {
                         it.sendMessage(message)

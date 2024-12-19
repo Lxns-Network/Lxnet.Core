@@ -31,7 +31,7 @@ class BlockHuntCompat : JavaPlugin(), Listener {
             config.getInt("score.tip-seeker"),
             config.getInt("score.tip-block"),
             config.getString("lang.tip")!!
-        ).runTaskTimer(this,0,10*20L)
+        ).runTaskTimer(this,0,50*20L)
         RaisePlayerTask(raiseMessage)
             .runTaskTimer(this,0,20L)
         LxnetCore.rpcManager.registerListener<RaisePlayerCall> {

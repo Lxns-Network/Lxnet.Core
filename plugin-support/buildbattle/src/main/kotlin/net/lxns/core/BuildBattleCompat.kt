@@ -18,7 +18,7 @@ class BuildBattleCompat : JavaPlugin(), Listener {
         reloadConfig()
         LxnetCore.rpcManager.registerListener<RaisePlayerCall>{ event ->
             Bukkit.getOnlinePlayers().forEach {
-                if(!Main.getPlugin(Main::class.java).arenaRegistry.isInArena(it)){
+                if(!getPlugin(Main::class.java).arenaRegistry.isInArena(it)){
                     it.sendMessage(event.message)
                 }
             }

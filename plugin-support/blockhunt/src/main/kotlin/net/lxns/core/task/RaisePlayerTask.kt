@@ -19,7 +19,7 @@ class RaisePlayerTask(
             return
         }
         if(Main.getInstance().game.status == STANDBY){
-            if(System.currentTimeMillis() - time > 20 * 1000){
+            if(System.currentTimeMillis() - time > 120 * 1000){
                 LxnetCore.rpcManager.requestCall(
                     RaisePlayerCall(
                         message,
