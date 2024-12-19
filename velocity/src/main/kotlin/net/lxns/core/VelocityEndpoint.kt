@@ -14,6 +14,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
 import net.lxns.core.dal.DataSource
 import net.lxns.core.dal.impl.InMemDataSource
+import net.lxns.core.dal.impl.ReadCacheDataSource
 import net.lxns.core.dal.impl.SQLDataSource
 import net.lxns.core.event.RemoteCallEvent
 import org.jetbrains.exposed.sql.Database
@@ -54,11 +55,13 @@ class VelocityEndpoint @Inject constructor(
         registerShoutCommand(this, proxyServer)
         registerLobbyCommand(this, proxyServer)
     }
+
     @Subscribe
-    fun onFini(event: ProxyShutdownEvent){
+    fun onFini(event: ProxyShutdownEvent) {
     }
+
     private fun loadDataSource(): DataSource {
-        return SQLDataSource(Database.connect("jdbc:sqlite:${dataDir}/scores.db"))
+        return ReadCacheDataSource(SQLDataSource(Database.connect("jdbc:sqlite:${dataDir}/scores.db")))
     }
 
     private fun loadConfig(): LxnetConfig {
@@ -84,9 +87,11 @@ class VelocityEndpoint @Inject constructor(
         if (event.source !is ServerConnection) return
         event.result = PluginMessageEvent.ForwardResult.handled()
         val globalEvent = lxNetFormat.decodeFromStream<RemoteCall<RemoteResponse>>(event.dataAsInputStream())
-        proxyServer.eventManager.fireAndForget(RemoteCallEvent(
-            globalEvent,
-            (event.source as ServerConnection).server
-        ))
+        proxyServer.eventManager.fireAndForget(
+            RemoteCallEvent(
+                globalEvent,
+                (event.source as ServerConnection).server
+            )
+        )
     }
 }
