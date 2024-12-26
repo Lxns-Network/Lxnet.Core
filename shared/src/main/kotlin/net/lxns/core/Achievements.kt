@@ -8,7 +8,7 @@ object Achievements {
             BedWars.BREAK_BED_IN_LOW_SITUATION,
             BedWars.GENOSIDE,
             BlockHunt.MURDER,
-            BlockHunt.ESCAPE_FROM_DEATH,
+            Parkour.PARKOUR_PLAYER,
             Parkour.PARKOUR_MASTER,
             Parkour.PARKOUR_MASTER_PLUS,
             BuildBattle.GUESS_ALL_RIGHT,
@@ -52,13 +52,19 @@ object Achievements {
             false,
             "parkour_master",
             "跑酷高手",
-            "完成跑酷游戏"
+            "在三十分钟内完成跑酷游戏"
+        )
+        val PARKOUR_PLAYER = Achievement(
+            false,
+            "parkour_player",
+            "登顶",
+            "完成跑酷游戏！",
         )
         val PARKOUR_MASTER_PLUS = Achievement(
             true,
             "parkour_master_plus",
             "跑酷大神",
-            "在十分钟内完成跑酷游戏"
+            "在二十分钟内完成跑酷游戏"
         )
     }
 
