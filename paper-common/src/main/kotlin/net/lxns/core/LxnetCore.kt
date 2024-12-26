@@ -36,8 +36,10 @@ class LxnetCore : JavaPlugin(), Listener {
         }
         server.pluginManager.registerEvents(this, this)
         commandManager.registerCommand(Commands)
-        server.messenger.registerIncomingPluginChannel(this, RPC_CHANNEL_IDENTIFIER, ChannelListener(rpcManager))
-        server.messenger.registerOutgoingPluginChannel(this, RPC_CHANNEL_IDENTIFIER)
+        val channelListener = ChannelListener(rpcManager)
+        server.messenger.registerIncomingPluginChannel(this, RPC_CALL_CHANNEL_IDENTIFIER, channelListener)
+        server.messenger.registerIncomingPluginChannel(this, RPC_RESPONSE_IDENTIFIER, channelListener)
+        server.messenger.registerOutgoingPluginChannel(this, RPC_CALL_CHANNEL_IDENTIFIER)
     }
 
     @EventHandler

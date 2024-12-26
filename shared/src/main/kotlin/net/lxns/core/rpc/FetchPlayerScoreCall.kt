@@ -14,6 +14,7 @@ class FetchPlayerScoreCall(
     val player: @Contextual UUID,
     override var id: Int = 0
 ) : RemoteCall<FetchPlayerScoreCall.Response>{
+
     @Serializable
     @SerialName("FetchPlayerScoreResponse")
     class Response (

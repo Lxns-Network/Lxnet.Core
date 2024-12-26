@@ -13,7 +13,6 @@ import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
 import net.lxns.core.dal.DataSource
-import net.lxns.core.dal.impl.InMemDataSource
 import net.lxns.core.dal.impl.ReadCacheDataSource
 import net.lxns.core.dal.impl.SQLDataSource
 import net.lxns.core.event.RemoteCallEvent
@@ -36,7 +35,8 @@ class VelocityEndpoint @Inject constructor(
     private val logger: Logger
 ) {
     companion object {
-        val rpcChannelIdentifier = MinecraftChannelIdentifier.from(RPC_CHANNEL_IDENTIFIER)
+        val callChannelId = MinecraftChannelIdentifier.from(RPC_CALL_CHANNEL_IDENTIFIER)
+        val respChannelId = MinecraftChannelIdentifier.from(RPC_RESPONSE_IDENTIFIER)
         lateinit var dataSource: DataSource
             private set
         lateinit var config: LxnetConfig
@@ -50,7 +50,7 @@ class VelocityEndpoint @Inject constructor(
         }
         config = loadConfig()
         dataSource = loadDataSource()
-        proxyServer.channelRegistrar.register(rpcChannelIdentifier)
+        proxyServer.channelRegistrar.register(callChannelId)
         proxyServer.eventManager.register(this, RemoteCallHandler(proxyServer))
         registerShoutCommand(this, proxyServer)
         registerLobbyCommand(this, proxyServer)
@@ -83,7 +83,7 @@ class VelocityEndpoint @Inject constructor(
     @OptIn(ExperimentalSerializationApi::class)
     @Subscribe
     fun onRemoteCall(event: PluginMessageEvent) {
-        if (event.identifier != rpcChannelIdentifier) return
+        if (event.identifier != callChannelId) return
         if (event.source !is ServerConnection) return
         event.result = PluginMessageEvent.ForwardResult.handled()
         val globalEvent = lxNetFormat.decodeFromStream<RemoteCall<RemoteResponse>>(event.dataAsInputStream())

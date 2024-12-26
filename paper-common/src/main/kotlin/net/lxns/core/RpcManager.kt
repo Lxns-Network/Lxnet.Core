@@ -5,7 +5,6 @@ import net.lxns.core.rpc.ResponseHandler
 import org.bukkit.Bukkit
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
-import kotlin.reflect.KClass
 
 class RpcManager {
     private val callIndex = AtomicInteger()
@@ -41,7 +40,7 @@ class RpcManager {
         call.id = callIndex.getAndIncrement()
         Bukkit.getServer().onlinePlayers.first().sendPluginMessage(
             LxnetCore.bukkitPlugin,
-            RPC_CHANNEL_IDENTIFIER,
+            RPC_CALL_CHANNEL_IDENTIFIER,
             lxNetFormat.encodeToString(call).encodeToByteArray()
         )
     }

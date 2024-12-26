@@ -4,8 +4,6 @@ import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.proxy.server.RegisteredServer
 import kotlinx.serialization.PolymorphicSerializer
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import net.lxns.core.event.RemoteCallEvent
 import net.lxns.core.rpc.GlobalBroadcastCall
 import net.lxns.core.rpc.AddPlayerScoreCall
@@ -37,7 +35,7 @@ class RemoteCallHandler(val server: ProxyServer) {
         for (registeredServer in server.allServers) {
             if(registeredServer != from){
                 registeredServer.sendPluginMessage(
-                    VelocityEndpoint.rpcChannelIdentifier,
+                    VelocityEndpoint.callChannelId,
                     lxNetFormat.encodeToString(PolymorphicSerializer(RemoteCall::class), event.call).encodeToByteArray()
                 )
             }
@@ -50,8 +48,8 @@ class RemoteCallHandler(val server: ProxyServer) {
         val score = VelocityEndpoint.dataSource.getPlayerScore(player)
         val resp = FetchPlayerScoreCall.Response(score, id)
         event.server.sendPluginMessage(
-            VelocityEndpoint.rpcChannelIdentifier,
-            lxNetFormat.encodeToString(resp).encodeToByteArray()
+            VelocityEndpoint.respChannelId,
+            lxNetFormat.encodeToString(PolymorphicSerializer(RemoteResponse::class), resp).encodeToByteArray()
         )
     }
 }
