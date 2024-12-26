@@ -1,16 +1,25 @@
 package net.lxns.core.compat
 
 import com.andrei1058.bedwars.api.BedWars
+import com.andrei1058.bedwars.api.arena.GameState
+import com.andrei1058.bedwars.api.arena.GameState.playing
+import com.andrei1058.bedwars.api.arena.IArena
 import com.andrei1058.bedwars.api.events.gameplay.GameEndEvent
+import com.andrei1058.bedwars.api.events.gameplay.GameStateChangeEvent
 import com.andrei1058.bedwars.api.events.player.PlayerBedBreakEvent
 import com.andrei1058.bedwars.api.events.player.PlayerKillEvent
+import com.andrei1058.bedwars.api.events.server.ArenaDisableEvent
+import com.andrei1058.bedwars.api.events.server.ArenaEnableEvent
+import com.andrei1058.bedwars.api.events.team.TeamEliminatedEvent
 import net.kyori.adventure.text.minimessage.MiniMessage
+import net.lxns.core.Achievements
 import net.lxns.core.LxnetCore
 import net.lxns.core.ScoreReason
 import net.lxns.core.bukkitColor
 import net.lxns.core.compat.task.CheckPlayerNumTask
 import net.lxns.core.record.PlayerScoreRecord
 import net.lxns.core.rpc.AddPlayerScoreCall
+import net.lxns.core.rpc.PlayerAchievementCall
 import net.lxns.core.rpc.RaisePlayerCall
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
@@ -18,25 +27,27 @@ import org.bukkit.event.Listener
 import org.bukkit.plugin.java.JavaPlugin
 import java.lang.IllegalStateException
 
-class BedwarsCompatPlugin : JavaPlugin(), Listener{
+class BedwarsCompatPlugin : JavaPlugin(), Listener {
     lateinit var bwApi: BedWars
+    val arenaData = mutableMapOf<String, ArenaData?>()
     override fun onEnable() {
         if (!dataFolder.exists())
             dataFolder.mkdir()
         saveDefaultConfig()
         reloadConfig()
-        if(Bukkit.getPluginManager().getPlugin("BedWars1058") == null){
+        if (Bukkit.getPluginManager().getPlugin("BedWars1058") == null) {
             logger.severe("Cannot find bedwars1058")
             isEnabled = false
             return
         }
-        bwApi = Bukkit.getServicesManager().getRegistration(BedWars::class.java)?.getProvider() ?: throw IllegalStateException("Cannot find bedwars plugin")
+        bwApi = Bukkit.getServicesManager().getRegistration(BedWars::class.java)?.getProvider()
+            ?: throw IllegalStateException("Cannot find bedwars plugin")
         Bukkit.getPluginManager().registerEvents(this, this)
         CheckPlayerNumTask(
             bwApi,
             MiniMessage.miniMessage().deserialize(config.getString("lang.raise-player")!!)
-        ).runTaskTimer(this,0L,2*60*20L)
-        LxnetCore.rpcManager.registerListener<RaisePlayerCall>{
+        ).runTaskTimer(this, 0L, 2 * 60 * 20L)
+        LxnetCore.rpcManager.registerListener<RaisePlayerCall> {
             for (player in Bukkit.getWorld(bwApi.lobbyWorld)!!.players) {
                 player.sendMessage(it.message)
             }
@@ -44,8 +55,26 @@ class BedwarsCompatPlugin : JavaPlugin(), Listener{
     }
 
     @EventHandler
+    fun onTeamDestroyed(event: TeamEliminatedEvent) {
+        val data = arenaData[event.arena.arenaName] ?: return
+        val killers = event.team.members.map { data.lastKiller[it.uniqueId] }.distinct()
+        if(killers.size == 1){
+            val killer = killers.first()!!
+            // must be online.
+            val player = Bukkit.getPlayer(killer) ?: return
+            LxnetCore.rpcManager.requestCall(
+                PlayerAchievementCall(
+                    player.uniqueId,
+                    Achievements.BedWars.GENOSIDE.id
+                )
+            )
+        }
+    }
+
+    @EventHandler
     fun onPlayerKill(event: PlayerKillEvent) {
         val killer = event.killer
+        arenaData[event.arena.arenaName]?.lastKiller[event.victim.uniqueId] = killer.uniqueId
         var score = if (event.cause.isFinalKill) config.getInt("score.final-kill") else config.getInt("score.kill")
         if (!event.cause.name.contains("PVP")) {
             score = (score * config.getDouble("score.not-pvp-multiplier")).toInt()
@@ -74,6 +103,24 @@ class BedwarsCompatPlugin : JavaPlugin(), Listener{
                 )
             )
         )
+        if (event.playerTeam.isBedDestroyed) {
+            LxnetCore.rpcManager.requestCall(
+                PlayerAchievementCall(
+                    p.uniqueId,
+                    Achievements.BedWars.BREAK_BED_IN_LOW_SITUATION.id
+                )
+            )
+        }
+    }
+
+    @EventHandler
+    fun onArenaEnabled(event: ArenaEnableEvent) {
+        arenaData[event.arena.arenaName] = ArenaData()
+    }
+
+    @EventHandler
+    fun onArenaDisabled(event: ArenaDisableEvent){
+        arenaData[event.arenaName] = null
     }
 
     @EventHandler
