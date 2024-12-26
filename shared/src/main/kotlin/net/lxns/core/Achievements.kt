@@ -13,7 +13,7 @@ object Achievements {
             Parkour.PARKOUR_MASTER_PLUS,
             BuildBattle.GUESS_ALL_RIGHT,
             BuildBattle.ABSTRACT_MASTER
-        )
+        ).map { it.id to it }.toMap()
     }
 
     @Serializable
@@ -22,8 +22,8 @@ object Achievements {
         val id: String,
         val name: String,
         val description: String
-    ) {
-    }
+    )
+
     object BedWars {
         val BREAK_BED_IN_LOW_SITUATION = Achievement(
             false,
@@ -38,6 +38,7 @@ object Achievements {
             "以一人之力灭队"
         )
     }
+
     object BlockHunt {
         val MURDER = Achievement(
             false,

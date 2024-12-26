@@ -2,6 +2,7 @@ package net.lxns.core
 
 import co.aikar.commands.PaperCommandManager
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
+import net.lxns.core.record.PlayerAchievementRecord
 import net.lxns.core.task.UpdatePlayerScoresTask
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -9,6 +10,7 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerQuitEvent
 import org.bukkit.plugin.java.JavaPlugin
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import java.util.logging.Logger
 
@@ -21,7 +23,9 @@ class LxnetCore : JavaPlugin(), Listener {
         lateinit var rpcManager: RpcManager
             private set
     }
-    private val playerScoreCache = ConcurrentHashMap<Player, Int>()
+
+    private val playerScoreCache = ConcurrentHashMap<UUID, Int>()
+    private val playerAchievementCache = ConcurrentHashMap<UUID, Map<String, PlayerAchievementRecord>>() // player -> (id -> record(id, time))
     private lateinit var commandManager: PaperCommandManager
 
     override fun onEnable() {
@@ -30,9 +34,10 @@ class LxnetCore : JavaPlugin(), Listener {
         bukkitPlugin = this
         rpcManager = RpcManager()
         commandManager = PaperCommandManager(this)
-        if(Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null){
-            UpdatePlayerScoresTask(playerScoreCache).runTaskTimer(this, 0L, 10*20L)
-            registerPlaceholders()
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+            UpdatePlayerScoresTask(playerScoreCache, playerAchievementCache).runTaskTimerAsynchronously(this, 0L, 10 * 20L)
+            registerCommonPlaceholders()
+            registerAchievementPlaceholders()
         }
         server.pluginManager.registerEvents(this, this)
         commandManager.registerCommand(Commands)
@@ -43,24 +48,43 @@ class LxnetCore : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun onLeave(event: PlayerQuitEvent){
-        playerScoreCache.remove(event.player)
+    fun onLeave(event: PlayerQuitEvent) {
+        playerScoreCache.remove(event.player.uniqueId)
+        playerAchievementCache.remove(event.player.uniqueId)
     }
 
-    private fun registerPlaceholders() {
-        object : PlaceholderExpansion(){
+    private fun registerCommonPlaceholders() {
+        object : PlaceholderExpansion() {
             override fun getIdentifier(): String = "lxnet"
 
             override fun getAuthor(): String = "iceBear67"
 
             override fun getVersion(): String = "0.1.0"
 
-            override fun onPlaceholderRequest(player: Player, params: String): String? {
-                return when(params) {
-                    "coin" -> playerScoreCache.computeIfAbsent(player) { -1 }.toString()
+            override fun onPlaceholderRequest(player: Player?, params: String): String? {
+                if (player == null) return null
+                return when (params) {
+                    "coin" -> playerScoreCache.computeIfAbsent(player.uniqueId) { -1 }.toString()
                     else -> "???"
                 }
             }
         }.register()
+    }
+
+    private fun registerAchievementPlaceholders() {
+        object : PlaceholderExpansion() {
+            override fun getIdentifier(): String = "la" // lxnet achievement
+
+            override fun getAuthor(): String = "iceBear67"
+
+            override fun getVersion(): String = "0.1.0"
+
+            override fun onPlaceholderRequest(player: Player?, params: String): String? {
+                if (player == null) return null
+                val achievements = playerAchievementCache.computeIfAbsent(player.uniqueId) { emptyMap<String, PlayerAchievementRecord>() }
+                return achievements[params]?.obtainTime.toString()
+            }
+
+        }
     }
 }
