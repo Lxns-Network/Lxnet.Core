@@ -45,12 +45,6 @@ object Achievements {
             "雨露均沾",
             "在一局躲猫猫游戏中扮演方块杀死一位猎人，并作为猎人杀死一个方块"
         )
-        val ESCAPE_FROM_DEATH = Achievement(
-            true,
-            "escape_from_death",
-            "死里逃生",
-            "当猎人在附近时被蜜鸟之弓射中，并逃离猎人的追踪"
-        )
     }
 
     object Parkour {
