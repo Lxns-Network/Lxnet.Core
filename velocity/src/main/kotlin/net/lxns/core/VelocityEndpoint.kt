@@ -54,7 +54,7 @@ class VelocityEndpoint @Inject constructor(
         config = loadConfig()
         dataSource = loadDataSource()
         proxyServer.channelRegistrar.register(callChannelId)
-        proxyServer.eventManager.register(this, RemoteCallHandler(proxyServer))
+        proxyServer.eventManager.register(this, RemoteCallHandler(proxyServer, logger))
         registerShoutCommand(this, proxyServer)
         registerLobbyCommand(this, proxyServer)
     }
@@ -91,7 +91,7 @@ class VelocityEndpoint @Inject constructor(
         if (event.identifier != callChannelId) return
         if (event.source !is ServerConnection) return
         event.result = PluginMessageEvent.ForwardResult.handled()
-        val globalEvent = lxNetFormat.decodeFromStream<RemoteCall<RemoteResponse>>(event.dataAsInputStream())
+        val globalEvent = lxNetFormat.decodeCall(event.dataAsInputStream())
         proxyServer.eventManager.fireAndForget(
             RemoteCallEvent(
                 globalEvent,

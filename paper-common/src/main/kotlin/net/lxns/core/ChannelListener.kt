@@ -18,7 +18,7 @@ class ChannelListener(
     }
 
     private fun handleResponseCall(bytes: ByteArray) {
-        val call = lxNetFormat.decodeFromStream<RemoteResponse>(PolymorphicSerializer(RemoteResponse::class), ByteArrayInputStream(bytes))
+        val call = lxNetFormat.decodeResponse(ByteArrayInputStream(bytes))
         val handler = rpcManager.getAndRevokeCallHandler(call.id) as? ResponseHandler<Any> ?: run {
             LxnetCore.logger.warning("No rpc handler is correspond to id ${call.id}")
             return
@@ -27,7 +27,7 @@ class ChannelListener(
     }
 
     private fun handleChannelCall(message: ByteArray) {
-        val call = lxNetFormat.decodeFromStream<RemoteCall<RemoteResponse>>(ByteArrayInputStream(message))
+        val call = lxNetFormat.decodeCall(ByteArrayInputStream(message))
         for (handler in rpcManager.listeners) {
             (handler as ResponseHandler<Any>).onResponse(call)
         }

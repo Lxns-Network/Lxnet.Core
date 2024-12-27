@@ -11,5 +11,5 @@ interface DataSource {
     fun getScoreRecords(player: UUID): Collection<PlayerScoreRecord>
     // achievements
     fun getAchievements(player: UUID): Collection<PlayerAchievementRecord>
-    fun addAchievement(player: UUID, achievement: Achievement)
+    fun addAchievement(player: UUID, achievement: String)
 }

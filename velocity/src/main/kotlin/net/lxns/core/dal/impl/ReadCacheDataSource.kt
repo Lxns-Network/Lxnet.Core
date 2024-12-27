@@ -58,12 +58,12 @@ class ReadCacheDataSource(
         }
     }
 
-    override fun addAchievement(player: UUID, achievement: Achievements.Achievement) {
+    override fun addAchievement(player: UUID, achievement: String) {
         writeLock {
             if(!achievements.containsKey(player)) {
                 achievements.put(player, upstream.getAchievements(player).toMutableList())
             }
-            val record = achievement.toAchievementRecord()
+            val record = PlayerAchievementRecord(achievement, System.currentTimeMillis())
             upstream.addAchievement(player, achievement)
             achievements.get(player)!!.add(record)
         }

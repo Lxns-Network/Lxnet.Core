@@ -71,17 +71,17 @@ class SQLDataSource(
         }
     }
 
-    override fun addAchievement(player: UUID, achievement: Achievements.Achievement) {
+    override fun addAchievement(player: UUID, achievement: String) {
         val uuidStr = player.toString()
         transaction(db) {
             val notExists = PlayerAchievementTable.selectAll().where {
                 PlayerAchievementTable.player eq uuidStr
-                PlayerAchievementTable.achievement eq achievement.id
+                PlayerAchievementTable.achievement eq achievement
             }.empty()
             if (notExists) {
                 PlayerAchievementTable.insert {
                     it[PlayerAchievementTable.player] = uuidStr
-                    it[PlayerAchievementTable.achievement] = achievement.id
+                    it[PlayerAchievementTable.achievement] = achievement
                     it[time] = System.currentTimeMillis()
                 }
             }

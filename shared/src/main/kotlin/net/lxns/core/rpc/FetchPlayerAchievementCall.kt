@@ -12,7 +12,7 @@ class FetchPlayerAchievementCall(
     override var id: Int = 0
 ) : RemoteCall<FetchPlayerAchievementCall.Response> {
     class Response(
-        val achievements: List<PlayerAchievementRecord>,
+        val achievements: Collection<PlayerAchievementRecord>,
         override val id: Int
     ) : RemoteResponse
 }

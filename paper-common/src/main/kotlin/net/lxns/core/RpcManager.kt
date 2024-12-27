@@ -41,7 +41,7 @@ class RpcManager {
         Bukkit.getServer().onlinePlayers.first().sendPluginMessage(
             LxnetCore.bukkitPlugin,
             RPC_CALL_CHANNEL_IDENTIFIER,
-            lxNetFormat.encodeToString(call).encodeToByteArray()
+            lxNetFormat.encodeCall(call).toByteArray()
         )
     }
 
