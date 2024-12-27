@@ -16,6 +16,7 @@ class ReadCacheDataSource(
 ) : DataSource {
     private val scores = ConcurrentHashMap<UUID, Int>()
     private val achievements = mutableMapOf<UUID, MutableList<PlayerAchievementRecord>>()
+    private val playerAchievementHashSetCache = ConcurrentHashMap<String, AchievementState>()
     private val readLock: Lock
     private val writeLock: Lock
 
@@ -58,16 +59,36 @@ class ReadCacheDataSource(
         }
     }
 
+    override fun hasAchievementBefore(player: UUID, achievement: String): Boolean {
+        return playerAchievementHashSetCache.computeIfAbsent(player.toString() + achievement) {
+            writeLock.lock()
+            try{
+                if (upstream.hasAchievementBefore(player, achievement)) {
+                    AchievementState.OBTAINED
+                } else {
+                    AchievementState.NOT_OBTAINED
+                }
+            }finally {
+                writeLock.unlock()
+            }
+        } == AchievementState.OBTAINED
+    }
+
     override fun addAchievement(player: UUID, achievement: String) {
         writeLock {
-            if(!achievements.containsKey(player)) {
+            if (!achievements.containsKey(player)) {
                 achievements.put(player, upstream.getAchievements(player).toMutableList())
             }
             val record = PlayerAchievementRecord(achievement, System.currentTimeMillis())
             upstream.addAchievement(player, achievement)
             achievements.get(player)!!.add(record)
+            playerAchievementHashSetCache[player.toString()+achievement] = AchievementState.OBTAINED
         }
     }
+}
+
+enum class AchievementState {
+    OBTAINED, NOT_OBTAINED
 }
 
 private inline operator fun Lock.invoke(crossinline scope: () -> Unit) {

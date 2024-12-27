@@ -6,7 +6,7 @@ plugins {
 }
 
 allprojects {
-    if(project.name.equals("plugin-support")) return
+    if (project.name.equals("plugin-support")) return
     apply plugin: 'org.jetbrains.kotlin.jvm'
     apply plugin: 'org.jetbrains.kotlin.plugin.serialization'
     apply plugin: 'com.gradleup.shadow'
@@ -23,6 +23,8 @@ allprojects {
         maven {
             url = "https://repo.papermc.io/repository/maven-public/"
         }
+        maven { url = uri("https://repo.codemc.io/repository/maven-releases/") }
+        maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
         maven {
             name = 'spigotmc-repo'
             url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'

@@ -1,5 +1,6 @@
 package net.lxns.core
 
+import com.github.retrooper.packetevents.PacketEvents
 import com.mojang.brigadier.Command
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.velocitypowered.api.command.BrigadierCommand
@@ -7,9 +8,11 @@ import com.velocitypowered.api.proxy.ConsoleCommandSource
 import com.velocitypowered.api.proxy.Player
 import com.velocitypowered.api.proxy.ProxyServer
 import net.kyori.adventure.text.minimessage.MiniMessage
+import net.lxns.core.packet.UpdateAdvancementPacket
+import net.lxns.core.packet.achievementPopup
 
 internal fun registerShoutCommand(plugin: VelocityEndpoint, proxyServer: ProxyServer) {
-    val cmd = BrigadierCommand.literalArgumentBuilder("shout")
+    val cmd = BrigadierCommand.literalArgumentBuilder("gshout")
         .then(
             BrigadierCommand.requiredArgumentBuilder("message", StringArgumentType.greedyString())
                 .executes { ctx ->
@@ -24,11 +27,12 @@ internal fun registerShoutCommand(plugin: VelocityEndpoint, proxyServer: ProxySe
                     )
                     proxyServer.allPlayers.forEach {
                         it.sendMessage(message)
+                        achievementPopup(it, Achievements.allAchievements.values.random())
                     }
                     Command.SINGLE_SUCCESS
                 }
         ).build()
-    val meta = proxyServer.commandManager.metaBuilder("shout")
+    val meta = proxyServer.commandManager.metaBuilder("gshout")
         .plugin(plugin)
         .build()
     proxyServer.commandManager.register(meta, BrigadierCommand(cmd))

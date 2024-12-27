@@ -1,15 +1,16 @@
 package net.lxns.core
 
+import com.github.retrooper.packetevents.PacketEvents
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.proxy.server.RegisteredServer
-import kotlinx.serialization.PolymorphicSerializer
-import kotlinx.serialization.encodeToString
 import net.lxns.core.event.RemoteCallEvent
-import net.lxns.core.rpc.GlobalBroadcastCall
+import net.lxns.core.packet.UpdateAdvancementPacket
+import net.lxns.core.packet.achievementPopup
 import net.lxns.core.rpc.AddPlayerScoreCall
 import net.lxns.core.rpc.FetchPlayerAchievementCall
 import net.lxns.core.rpc.FetchPlayerScoreCall
+import net.lxns.core.rpc.GlobalBroadcastCall
 import net.lxns.core.rpc.PlayerAchievementCall
 import net.lxns.core.rpc.RaisePlayerCall
 import net.lxns.core.rpc.SendMessageCall
@@ -50,7 +51,18 @@ class RemoteCallHandler(
         if (!Achievements.allAchievements.containsKey(call.achievementId)) {
             logger.warn("Achievement ${call.achievementId} not found")
         }
-        VelocityEndpoint.dataSource.addAchievement(call.player, call.achievementId)
+        val ds = VelocityEndpoint.dataSource
+
+        // A typical check-then-set doesn't guarantee thread-safe.
+        // It's an effort to avoid large queries. There's another check in the underlying implementation
+        // to make this operation behaves correctly.
+        if(!ds.hasAchievementBefore(call.player, call.achievementId)){
+            ds.addAchievement(call.player, call.achievementId)
+            // send achievement dialog
+            val player = server.getPlayer(call.player).getOrNull() ?: return
+            val achievement = Achievements.allAchievements[call.achievementId] ?: return
+            achievementPopup(player, achievement)
+        }
     }
 
     private fun onRaisingPlayer(

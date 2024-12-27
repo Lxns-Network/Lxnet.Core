@@ -1,21 +1,30 @@
 package net.lxns.core
 
+import com.github.retrooper.packetevents.PacketEvents
+import com.github.retrooper.packetevents.PacketEventsAPI
+import com.github.retrooper.packetevents.event.PacketEvent
+import com.github.retrooper.packetevents.protocol.item.type.ItemTypes
 import com.google.inject.Inject
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.event.connection.PluginMessageEvent
+import com.velocitypowered.api.event.player.configuration.PlayerFinishedConfigurationEvent
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent
 import com.velocitypowered.api.plugin.Plugin
+import com.velocitypowered.api.plugin.PluginContainer
 import com.velocitypowered.api.plugin.annotation.DataDirectory
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.proxy.ServerConnection
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier
+import io.github.retrooper.packetevents.velocity.factory.VelocityPacketEventsBuilder
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.decodeFromStream
+import net.lxns.core.Achievements.Achievement
 import net.lxns.core.dal.DataSource
 import net.lxns.core.dal.impl.ReadCacheDataSource
 import net.lxns.core.dal.impl.SQLDataSource
 import net.lxns.core.event.RemoteCallEvent
+import net.lxns.core.packet.UpdateAdvancementPacket
 import org.jetbrains.exposed.dao.flushCache
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.transactions.TransactionManager
@@ -24,6 +33,7 @@ import org.slf4j.Logger
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.concurrent.TimeUnit
 import kotlin.io.path.exists
 import kotlin.io.path.readText
 
@@ -35,7 +45,8 @@ import kotlin.io.path.readText
 class VelocityEndpoint @Inject constructor(
     private val proxyServer: ProxyServer,
     @DataDirectory private val dataDir: Path,
-    private val logger: Logger
+    private val logger: Logger,
+    private val container: PluginContainer
 ) {
     companion object {
         val callChannelId = MinecraftChannelIdentifier.from(RPC_CALL_CHANNEL_IDENTIFIER)
@@ -48,6 +59,13 @@ class VelocityEndpoint @Inject constructor(
 
     @Subscribe
     fun onInit(event: ProxyInitializeEvent) {
+        PacketEvents.setAPI(VelocityPacketEventsBuilder.build(
+            proxyServer,
+            container,
+            logger,
+            dataDir
+        ))
+        PacketEvents.getAPI().init()
         if (Files.notExists(dataDir)) {
             Files.createDirectory(dataDir);
         }

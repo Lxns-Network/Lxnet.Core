@@ -71,6 +71,16 @@ class SQLDataSource(
         }
     }
 
+    override fun hasAchievementBefore(player: UUID, achievement: String): Boolean {
+        val uuidStr = player.toString()
+        return !transaction(db) {
+            PlayerAchievementTable.selectAll().where {
+                PlayerAchievementTable.player eq uuidStr
+                PlayerAchievementTable.achievement eq achievement
+            }.empty()
+        }
+    }
+
     override fun addAchievement(player: UUID, achievement: String) {
         val uuidStr = player.toString()
         transaction(db) {
