@@ -1,6 +1,7 @@
 package net.lxns.core
 
 import kotlinx.serialization.Serializable
+import net.lxns.core.record.PlayerAchievementRecord
 
 object Achievements {
     val allAchievements by lazy {
@@ -22,7 +23,11 @@ object Achievements {
         val id: String,
         val name: String,
         val description: String
-    )
+    ) {
+        fun toAchievementRecord() = PlayerAchievementRecord(
+            id, System.currentTimeMillis()
+        )
+    }
 
     object BedWars {
         val BREAK_BED_IN_LOW_SITUATION = Achievement(
