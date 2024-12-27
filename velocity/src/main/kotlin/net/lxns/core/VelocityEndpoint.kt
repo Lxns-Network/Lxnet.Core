@@ -16,7 +16,10 @@ import net.lxns.core.dal.DataSource
 import net.lxns.core.dal.impl.ReadCacheDataSource
 import net.lxns.core.dal.impl.SQLDataSource
 import net.lxns.core.event.RemoteCallEvent
+import org.jetbrains.exposed.dao.flushCache
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.Logger
 import org.spongepowered.configurate.yaml.YamlConfigurationLoader
 import java.nio.file.Files
@@ -58,10 +61,12 @@ class VelocityEndpoint @Inject constructor(
 
     @Subscribe
     fun onFini(event: ProxyShutdownEvent) {
+        TransactionManager.currentOrNull()?.flushCache()
+        TransactionManager.currentOrNull()?.close()
     }
 
     private fun loadDataSource(): DataSource {
-        return ReadCacheDataSource(SQLDataSource(Database.connect("jdbc:sqlite:${dataDir}/scores.db")))
+        return ReadCacheDataSource(SQLDataSource(Database.connect("jdbc:sqlite:${dataDir}/scores.db")), logger)
     }
 
     private fun loadConfig(): LxnetConfig {
