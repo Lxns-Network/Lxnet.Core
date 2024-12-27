@@ -27,7 +27,6 @@ internal fun registerShoutCommand(plugin: VelocityEndpoint, proxyServer: ProxySe
                     )
                     proxyServer.allPlayers.forEach {
                         it.sendMessage(message)
-                        achievementPopup(it, Achievements.allAchievements.values.random())
                     }
                     Command.SINGLE_SUCCESS
                 }
