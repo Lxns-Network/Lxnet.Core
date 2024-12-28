@@ -7,10 +7,12 @@ import net.lxns.core.record.PlayerAchievementRecord
 import net.lxns.core.serializers.UUIDSerializer
 import java.util.UUID
 
+@Serializable
 class FetchPlayerAchievementCall(
     val player: @Serializable(UUIDSerializer::class) UUID,
     override var id: Int = 0
 ) : RemoteCall<FetchPlayerAchievementCall.Response> {
+    @Serializable
     class Response(
         val achievements: Collection<PlayerAchievementRecord>,
         override val id: Int

@@ -1,0 +1,9 @@
+dependencies {
+    compileOnly libs.paper.api
+    compileOnly project(":paper-common")
+    implementation libs.canvas
+}
+
+shadowJar {
+    relocate 'org.ipvp', 'menu.ipvp'
+}

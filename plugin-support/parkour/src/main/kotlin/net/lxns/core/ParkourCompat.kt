@@ -30,7 +30,7 @@ class ParkourCompat : JavaPlugin(), Listener {
             this,
             config.getString("message")!!
         ).runTaskTimer(this, 0, 60 * 20L)
-        LocationSamplingTask(this,config.getDouble("score-initial").toInt()).runTaskTimer(this, 0, 35L)
+        LocationSamplingTask(this, config.getDouble("score-initial").toInt()).runTaskTimer(this, 0, 35L)
         Bukkit.getPluginManager().registerEvents(this, this)
         pdcKeyFirstJoin = NamespacedKey(this, "first_join")
     }
@@ -42,18 +42,18 @@ class ParkourCompat : JavaPlugin(), Listener {
 
     private fun loadData() {
         val list = dataFolder.resolve("claimed_players")
-        if(!list.exists()) return
+        if (!list.exists()) return
         list.readLines().forEach {
             claimedPlayers.add(UUID.fromString(it))
         }
     }
 
-    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>?): Boolean {
-        if(label.equals("reward", ignoreCase = true)){
-            if(sender is Player) {
-                if(claimedPlayers.contains(sender.uniqueId)){
+    override fun onCommand(sender: CommandSender, command: Command, label: String, args: Array<out String>): Boolean {
+        if (label.equals("reward", ignoreCase = true)) {
+            if (sender is Player) {
+                if (claimedPlayers.contains(sender.uniqueId)) {
                     sender.sendMessage("&c你已经领取过了！".bukkitColor())
-                }else{
+                } else {
                     claimedPlayers.add(sender.uniqueId)
                     val score = config.getInt("score-win")
                     sender.sendMessage("&6恭喜你完成了跑酷挑战! ( +%d硬币 )".format(score).bukkitColor())
@@ -74,14 +74,14 @@ class ParkourCompat : JavaPlugin(), Listener {
                             Achievements.Parkour.PARKOUR_PLAYER.id
                         )
                     )
-                    if(timeElasped < 30*60*1000){
+                    if (timeElasped < 30 * 60 * 1000) {
                         LxnetCore.rpcManager.requestCall(
                             PlayerAchievementCall(
                                 sender.uniqueId,
                                 Achievements.Parkour.PARKOUR_MASTER.id
                             )
                         )
-                        if(timeElasped < 20*60*1000){
+                        if (timeElasped < 20 * 60 * 1000) {
                             LxnetCore.rpcManager.requestCall(
                                 PlayerAchievementCall(
                                     sender.uniqueId,
@@ -100,7 +100,7 @@ class ParkourCompat : JavaPlugin(), Listener {
     fun onJoin(event: PlayerJoinEvent) {
         playerScores.computeIfAbsent(event.player.uniqueId) { config.getDouble("score-initial") }
         val pdc = event.player.persistentDataContainer
-        if(!pdc.has(pdcKeyFirstJoin)){
+        if (!pdc.has(pdcKeyFirstJoin)) {
             pdc.set(pdcKeyFirstJoin, PersistentDataType.LONG, System.currentTimeMillis())
         }
     }

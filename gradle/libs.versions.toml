@@ -4,8 +4,9 @@ velocity = { group = "com.velocitypowered", name = "velocity-api", version.ref =
 velocity-kapt = { group = "com.velocitypowered", name = "velocity-api", version.ref = "velocity" }
 adventure = { group = "net.kyori", name = "adventure-api", version.ref = "adventure" }
 adventure-mm = { group = "net.kyori", name = "adventure-text-minimessage", version.ref = "adventure" }
-aikar-commands = { group = "co.aikar", name= "acf-paper", version.ref = "aikar-commands"}
+aikar-commands = { group = "co.aikar", name = "acf-paper", version.ref = "aikar-commands" }
 placeholderapi = { group = "me.clip", name = "placeholderapi", version.ref = "placeholderapi" }
+canvas = { group = "org.ipvp", name = "canvas", version.ref = "canvas" }
 
 [versions]
 paper-api-current = "1.21.4-R0.1-SNAPSHOT"
@@ -13,3 +14,4 @@ velocity = "3.4.0-SNAPSHOT"
 adventure = "4.17.0"
 aikar-commands = "0.5.1-SNAPSHOT"
 placeholderapi = "2.11.6"
+canvas = "1.7.0-SNAPSHOT"

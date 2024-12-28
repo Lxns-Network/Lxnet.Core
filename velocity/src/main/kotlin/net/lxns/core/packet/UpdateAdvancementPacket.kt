@@ -40,7 +40,7 @@ internal class UpdateAdvancementPacket(
             writeBoolean(true) // has display
             // write display
             writeComponent(MiniMessage.miniMessage().deserialize(achievement.name)) // title
-            writeComponent(MiniMessage.miniMessage().deserialize(achievement.description)) // desc
+            writeComponent(MiniMessage.miniMessage().deserialize(achievement.description.first())) // desc
             writePresentItemStack(ItemStack.builder().type(item).build()) // icon
             if (achievement.extra) {
                 writeVarInt(1) // frame type challenge

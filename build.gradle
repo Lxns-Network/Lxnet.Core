@@ -44,6 +44,6 @@ allprojects {
         jvmToolchain(21)
     }
     shadowJar {
-        relocate 'kotlin', 'net.lxns.relocate.kotlin'
+        relocate 'kotlin', "lxns.relocate.kotlin"
     }
 }

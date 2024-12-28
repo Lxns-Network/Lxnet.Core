@@ -9,8 +9,10 @@ import kotlinx.serialization.modules.polymorphic
 import kotlinx.serialization.modules.subclass
 import net.kyori.adventure.text.Component
 import net.lxns.core.rpc.AddPlayerScoreCall
+import net.lxns.core.rpc.FetchPlayerAchievementCall
 import net.lxns.core.rpc.FetchPlayerScoreCall
 import net.lxns.core.rpc.GlobalBroadcastCall
+import net.lxns.core.rpc.PlayerAchievementCall
 import net.lxns.core.rpc.RaisePlayerCall
 import net.lxns.core.rpc.SendMessageCall
 import net.lxns.core.serializers.ComponentSerializer
@@ -24,11 +26,14 @@ internal val module = SerializersModule {
         subclass(GlobalBroadcastCall::class)
         subclass(RaisePlayerCall::class)
         subclass(SendMessageCall::class)
+        subclass(PlayerAchievementCall::class)
+        subclass(FetchPlayerAchievementCall::class)
     }
     contextual(Component::class) { ComponentSerializer }
     contextual(UUIDSerializer)
     polymorphic(RemoteResponse::class) {
         subclass(FetchPlayerScoreCall.Response::class)
+        subclass(FetchPlayerAchievementCall.Response::class)
         subclass(NoResponse::class)
     }
 }

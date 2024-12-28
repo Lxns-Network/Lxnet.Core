@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.PacketEvents
 import com.velocitypowered.api.event.Subscribe
 import com.velocitypowered.api.proxy.ProxyServer
 import com.velocitypowered.api.proxy.server.RegisteredServer
+import net.kyori.adventure.text.minimessage.MiniMessage
 import net.lxns.core.event.RemoteCallEvent
 import net.lxns.core.packet.UpdateAdvancementPacket
 import net.lxns.core.packet.achievementPopup
@@ -62,6 +63,9 @@ class RemoteCallHandler(
             val player = server.getPlayer(call.player).getOrNull() ?: return
             val achievement = Achievements.allAchievements[call.achievementId] ?: return
             achievementPopup(player, achievement)
+            player.sendMessage(MiniMessage.miniMessage().deserialize(
+                "<hover:show_text:'${achievement.description}'><gold> <obf>qwq</obf> >></gold> <dark_green>解锁成就:</dark_green> ${achievement.name} <gold><<  <obf>qwq</obf> </gold></hover>"
+            ))
         }
     }
 
