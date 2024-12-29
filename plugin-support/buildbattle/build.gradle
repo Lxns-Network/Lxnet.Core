@@ -4,7 +4,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly "plugily.projects:buildbattle:5.0.15-LXNET"
+    compileOnly "plugily.projects:buildbattle:5.0.16-LXNET"
     compileOnly libs.paper.api
     compileOnly project(":paper-common")
 }

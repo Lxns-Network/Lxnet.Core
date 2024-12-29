@@ -1,12 +1,9 @@
 package net.lxns.core.compat
 
 import com.andrei1058.bedwars.api.BedWars
-import com.andrei1058.bedwars.api.arena.GameState
-import com.andrei1058.bedwars.api.arena.GameState.playing
-import com.andrei1058.bedwars.api.arena.IArena
 import com.andrei1058.bedwars.api.events.gameplay.GameEndEvent
-import com.andrei1058.bedwars.api.events.gameplay.GameStateChangeEvent
 import com.andrei1058.bedwars.api.events.player.PlayerBedBreakEvent
+import com.andrei1058.bedwars.api.events.player.PlayerJoinArenaEvent
 import com.andrei1058.bedwars.api.events.player.PlayerKillEvent
 import com.andrei1058.bedwars.api.events.server.ArenaDisableEvent
 import com.andrei1058.bedwars.api.events.server.ArenaEnableEvent
@@ -22,13 +19,19 @@ import net.lxns.core.rpc.AddPlayerScoreCall
 import net.lxns.core.rpc.PlayerAchievementCall
 import net.lxns.core.rpc.RaisePlayerCall
 import org.bukkit.Bukkit
+import org.bukkit.NamespacedKey
+import org.bukkit.Registry
+import org.bukkit.enchantments.Enchantment
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityDamageByEntityEvent
 import org.bukkit.plugin.java.JavaPlugin
 import java.lang.IllegalStateException
 
 class BedwarsCompatPlugin : JavaPlugin(), Listener {
     lateinit var bwApi: BedWars
+    lateinit var efficiencyEnchantment: Enchantment
     val arenaData = mutableMapOf<String, ArenaData?>()
     override fun onEnable() {
         if (!dataFolder.exists())
@@ -52,13 +55,14 @@ class BedwarsCompatPlugin : JavaPlugin(), Listener {
                 player.sendMessage(it.message)
             }
         }
+        efficiencyEnchantment = Registry.ENCHANTMENT.get(NamespacedKey.minecraft("efficiency")) !!
     }
 
     @EventHandler
     fun onTeamDestroyed(event: TeamEliminatedEvent) {
         val data = arenaData[event.arena.arenaName] ?: return
         val killers = event.team.members.map { data.lastKiller[it.uniqueId] }.distinct()
-        if(killers.size == 1){
+        if (killers.size == 1) {
             val killer = killers.first()!!
             // must be online.
             val player = Bukkit.getPlayer(killer) ?: return
@@ -73,7 +77,7 @@ class BedwarsCompatPlugin : JavaPlugin(), Listener {
 
     @EventHandler
     fun onPlayerKill(event: PlayerKillEvent) {
-        val killer = event.killer
+        val killer = event.killer ?: return
         arenaData[event.arena.arenaName]?.lastKiller[event.victim.uniqueId] = killer.uniqueId
         var score = if (event.cause.isFinalKill) config.getInt("score.final-kill") else config.getInt("score.kill")
         if (!event.cause.name.contains("PVP")) {
@@ -119,8 +123,26 @@ class BedwarsCompatPlugin : JavaPlugin(), Listener {
     }
 
     @EventHandler
-    fun onArenaDisabled(event: ArenaDisableEvent){
+    fun onPlayerJoin(event: PlayerJoinArenaEvent) {
+        event.player.setPlayerTime(1200, false)
+    }
+
+    @EventHandler
+    fun onArenaDisabled(event: ArenaDisableEvent) {
         arenaData[event.arenaName] = null
+    }
+
+    @EventHandler
+    fun onDamageByOther(evt: EntityDamageByEntityEvent) {
+        val damager = evt.damager
+        if (damager is Player) {
+            val itemInHand = damager.equipment.itemInMainHand
+            if(itemInHand.hasItemMeta()){
+                if(itemInHand.itemMeta.hasEnchant(efficiencyEnchantment)){
+                    evt.isCancelled = true
+                }
+            }
+        }
     }
 
     @EventHandler

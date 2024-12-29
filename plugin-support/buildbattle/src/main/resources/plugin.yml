@@ -5,3 +5,6 @@ api-version: 1.20
 depend:
   - Lxnet.Core
   - BuildBattle
+commands:
+  rjoin:
+    description: ""

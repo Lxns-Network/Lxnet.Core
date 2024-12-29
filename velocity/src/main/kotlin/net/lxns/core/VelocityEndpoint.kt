@@ -79,8 +79,6 @@ class VelocityEndpoint @Inject constructor(
 
     @Subscribe
     fun onFini(event: ProxyShutdownEvent) {
-        TransactionManager.currentOrNull()?.flushCache()
-        TransactionManager.currentOrNull()?.close()
     }
 
     private fun loadDataSource(): DataSource {

@@ -5,8 +5,11 @@ import net.lxns.core.rpc.AddPlayerScoreCall
 import net.lxns.core.rpc.PlayerAchievementCall
 import net.lxns.core.rpc.RaisePlayerCall
 import org.bukkit.Bukkit
+import org.bukkit.command.Command
+import org.bukkit.command.CommandSender
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.plugin.java.JavaPlugin
 import plugily.projects.buildbattle.Main
 import plugily.projects.buildbattle.api.event.guess.GuessRoundEndEvent
@@ -38,9 +41,20 @@ class BuildBattleCompat : JavaPlugin(), Listener {
     }
 
     @EventHandler
+    fun onPlayerJoin(event: PlayerJoinEvent){
+        if(event.player.world.name != "world"){
+            event.player.performCommand("bb randomjoin")
+        }
+    }
+
+    @EventHandler
     fun onArenaBegin(event: PlugilyGameStartEvent) {
         if (event.arena is GuessArena) {
-            arenaData[event.arena] = ArenaData()
+            arenaData[event.arena] = ArenaData().also { data ->
+                event.arena.players.forEach {
+                    data.playerWinType[it.uniqueId] = null
+                }
+            }
         }
     }
 
@@ -51,18 +65,22 @@ class BuildBattleCompat : JavaPlugin(), Listener {
             if (!data.playerWinType.contains(it)) playerWinStreak.remove(it)
         }
         data.playerWinType.forEach { (player, winType) ->
+            println("wintype $player $winType")
             val record = playerWinStreak.computeIfAbsent(player) { mutableListOf<WinType>() }
             if (winType == WinType.BUILDER_GUESSED_ALL_RIGHT) {
                 if (data.failedPlayers.contains(player)) {
                     // 完美建筑但是没有全部猜对
                     record.add(WinType.BUILDER_GUESSED_ALL_RIGHT)
+                    println("Winstreak: ALL BUILT RIGHT, $player")
                 } else {
                     // full win
                     record.add(WinType.FULL_WIN)
+                    println("Winstreak: FULL WIN, $player")
                 }
             } else {
                 // 猜对了所有建筑，但是没有建出让所有人猜对的建筑
                 record.add(WinType.ALL_GUESSED)
+                println("Winstreak: ALL GUESSED, $player")
             }
         }
         checkAchievements()
@@ -80,6 +98,7 @@ class BuildBattleCompat : JavaPlugin(), Listener {
                         Achievements.BuildBattle.GUESS_ALL_RIGHT.id
                     )
                 )
+                println("Achievement for $player, master")
             }
             if (winTypes.size >= 3 && !masterAchievementPlayers.contains(player)) {
                 if (winTypes.subList(winTypes.size - 3, winTypes.size).all { it == WinType.FULL_WIN }) {
@@ -90,6 +109,7 @@ class BuildBattleCompat : JavaPlugin(), Listener {
                         )
                     )
                     masterAchievementPlayers.add(player)
+                    println("Achievement for $player, master+")
                 }
             }
         }
@@ -98,24 +118,28 @@ class BuildBattleCompat : JavaPlugin(), Listener {
     @EventHandler
     fun onGuessRoundEnd(event: GuessRoundEndEvent) {
         val arena = event.arena
-        if (event.isAllGuessed) return
         val arenaData = arenaData[arena]!!
-        val guessed = arena.whoGuessed
-        val builders = event.arena.currentBuilders
-        builders.forEach {
-            if (event.isAllGuessed) {
-                // 建出满分建筑
+        val guessed = event.guessed
+        val builders = event.currentBuilders
+        println(event.isAllGuessed)
+        println(builders.map { it.name }.joinToString(", "))
+        println(guessed.map { it.name }.joinToString(", "))
+        if (event.isAllGuessed) {
+            builders.forEach {
+                // 建出满分建筑 TODO NOT TRIGGETED
                 arenaData.playerWinType[it.uniqueId] = WinType.BUILDER_GUESSED_ALL_RIGHT
+                println("player ${it.name} == BUILD ALL RIGHT")
             }
         }
-        arena.playersLeft
-            .filterNot { guessed.contains(it) && builders.contains(it) }
+        event.playersLeft
+            .filter { !guessed.contains(it) && !builders.contains(it) }
             .forEach {
                 val originalType = arenaData.playerWinType[it.uniqueId]
                 arenaData.failedPlayers.add(it.uniqueId)
                 if (originalType != WinType.BUILDER_GUESSED_ALL_RIGHT) {
                     // 没有猜对而且也没有建出满分建筑
                     arenaData.playerWinType.remove(it.uniqueId)
+                    println("player ${it.name} == REMOVED FROM WINTYPE")
                 }
             }
     }
@@ -129,7 +153,7 @@ class BuildBattleCompat : JavaPlugin(), Listener {
             2 -> config.getInt("bonus.third")
             else -> 0
         }
-        val builderScore = config.getInt("guess-builder-per-answer")
+        val builderScore = config.getInt("score.guess-builder-per-answer")
         event.player.sendMessage(config.getString("message.guess-right")!!.format(score).bukkitColor())
         LxnetCore.rpcManager.requestCall(
             AddPlayerScoreCall(
