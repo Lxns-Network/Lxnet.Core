@@ -16,8 +16,10 @@ import net.lxns.core.rpc.RaisePlayerCall
 import net.lxns.core.task.RaisePlayerTask
 import net.lxns.core.task.RewardTask
 import org.bukkit.Bukkit
+import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.weather.WeatherChangeEvent
 import org.bukkit.plugin.java.JavaPlugin
 
 class BlockHuntCompat : JavaPlugin(), Listener {
@@ -40,6 +42,13 @@ class BlockHuntCompat : JavaPlugin(), Listener {
             if (Main.getInstance().game.status == STANDBY) {
                 Bukkit.broadcast(it.message)
             }
+        }
+    }
+
+    @EventHandler
+    fun onWeather(event: WeatherChangeEvent){
+        if(event.world.name.startsWith("hs")){
+            event.isCancelled = true
         }
     }
 
@@ -68,6 +77,9 @@ class BlockHuntCompat : JavaPlugin(), Listener {
                     )
                 )
             )
+        }
+        for (player in Bukkit.getOnlinePlayers()) {
+            player.setArrowsInBody(0)
         }
     }
 

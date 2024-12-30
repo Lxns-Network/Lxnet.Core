@@ -9,6 +9,9 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.SkullMeta
 import org.ipvp.canvas.template.ItemStackTemplate
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
@@ -42,7 +45,8 @@ fun itemTemplateAchievement(
             achievement.description.forEach { lores.add(ChatColor.WHITE + it) }
             if (achiRcrd != null) {
                 lores.add("")
-                lores.add("&6&l您已达成该成就！&r&f(${achievementDateTimeFormat.format(Instant.ofEpochMilli(achiRcrd.obtainTime))})".bukkitColor())
+                lores.add("&6&l您已达成该成就！".bukkitColor())
+                lores.add("&8${achievementDateTimeFormat.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(achiRcrd.obtainTime), ZoneId.systemDefault()))}".bukkitColor())
                 setEnchantmentGlintOverride(true)
             }
             lore = lores

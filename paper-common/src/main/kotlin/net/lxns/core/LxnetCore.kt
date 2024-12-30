@@ -96,7 +96,7 @@ class LxnetCore : JavaPlugin(), Listener {
                 if (player == null) return null
                 return when (params) {
                     "coin" -> getCachedScore(player.uniqueId).toString()
-                    "achievement_accomplished_total" -> getCachedAchievements(player.uniqueId).keys.size.toString()
+                    "achievement_accomplished_total" -> getCachedAchievements(player.uniqueId).size.toString()
                     "achievement_accomplished_extra" -> getCachedAchievements(player.uniqueId)
                         .values.count { extraAchievements.contains(it.achievement) }.toString()
 

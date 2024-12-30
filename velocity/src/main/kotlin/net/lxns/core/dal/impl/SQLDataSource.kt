@@ -13,6 +13,7 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -24,6 +25,7 @@ class SQLDataSource(
     init {
         transaction(db) {
             SchemaUtils.create(PlayerScoreTable)
+            SchemaUtils.create(PlayerAchievementTable)
         }
     }
 
@@ -75,8 +77,8 @@ class SQLDataSource(
         val uuidStr = player.toString()
         return !transaction(db) {
             PlayerAchievementTable.selectAll().where {
-                PlayerAchievementTable.player eq uuidStr
-                PlayerAchievementTable.achievement eq achievement
+                (PlayerAchievementTable.player eq uuidStr) and
+                        (PlayerAchievementTable.achievement eq achievement)
             }.empty()
         }
     }
@@ -85,8 +87,8 @@ class SQLDataSource(
         val uuidStr = player.toString()
         transaction(db) {
             val notExists = PlayerAchievementTable.selectAll().where {
-                PlayerAchievementTable.player eq uuidStr
-                PlayerAchievementTable.achievement eq achievement
+                (PlayerAchievementTable.player eq uuidStr) and
+                        (PlayerAchievementTable.achievement eq achievement)
             }.empty()
             if (notExists) {
                 PlayerAchievementTable.insert {

@@ -67,6 +67,7 @@ class RemoteCallHandler(
                 "<hover:show_text:'${achievement.description}'><gold> <obf>qwq</obf> >></gold> <dark_green>解锁成就:</dark_green> ${achievement.name} <gold><<  <obf>qwq</obf> </gold></hover>"
             ))
         }
+        println()
     }
 
     private fun onRaisingPlayer(
