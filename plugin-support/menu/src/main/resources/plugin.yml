@@ -3,6 +3,8 @@ main: net.lxns.core.LobbyMenuPlugin
 version: 0.1.0
 api-version: 1.20
 commands:
+  golottery:
+    description: 开奖
   achievements:
     aliases: [ a,achi ]
     description: 成就菜单

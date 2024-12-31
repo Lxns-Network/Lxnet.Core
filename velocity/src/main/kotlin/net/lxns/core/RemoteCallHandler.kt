@@ -8,6 +8,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import net.lxns.core.event.RemoteCallEvent
 import net.lxns.core.packet.UpdateAdvancementPacket
 import net.lxns.core.packet.achievementPopup
+import net.lxns.core.record.PlayerScoreRecord
 import net.lxns.core.rpc.AddPlayerScoreCall
 import net.lxns.core.rpc.FetchPlayerAchievementCall
 import net.lxns.core.rpc.FetchPlayerScoreCall
@@ -15,6 +16,7 @@ import net.lxns.core.rpc.GlobalBroadcastCall
 import net.lxns.core.rpc.PlayerAchievementCall
 import net.lxns.core.rpc.RaisePlayerCall
 import net.lxns.core.rpc.SendMessageCall
+import net.lxns.core.rpc.WithdrawPlayerScoreCall
 import org.slf4j.Logger
 import kotlin.jvm.optionals.getOrNull
 
@@ -32,11 +34,36 @@ class RemoteCallHandler(
             }
 
             is AddPlayerScoreCall -> VelocityEndpoint.dataSource.addPlayerScore(event.call.record)
+            is WithdrawPlayerScoreCall -> onWithdrawPlayerScore(event as RemoteCallEvent<WithdrawPlayerScoreCall>)
             is FetchPlayerScoreCall -> onFetchPlayerScore(event as RemoteCallEvent<FetchPlayerScoreCall>)
             is RaisePlayerCall -> onRaisingPlayer(event as RemoteCallEvent<RaisePlayerCall>, event.server)
             is SendMessageCall -> server.getPlayer(event.call.player).getOrNull()?.sendMessage(event.call.message)
             is PlayerAchievementCall -> onAchievementCall(event.call)
             is FetchPlayerAchievementCall -> onFetchPlayerAchievement(event as RemoteCallEvent<FetchPlayerAchievementCall>)
+        }
+    }
+
+    private fun onWithdrawPlayerScore(event: RemoteCallEvent<WithdrawPlayerScoreCall>) {
+        val record = event.call.record
+        val scores = VelocityEndpoint.dataSource.getPlayerScore(record.player)
+        if (record.score > scores) {
+            // fail.
+            event.server.sendPluginMessage(
+                VelocityEndpoint.respChannelId,
+                lxNetFormat.encodeResponse(WithdrawPlayerScoreCall.Response(false, scores, event.call.id)).toByteArray()
+            )
+        }else{
+            // success
+            VelocityEndpoint.dataSource.addPlayerScore(PlayerScoreRecord(
+                record.player,
+                record.score * -1,
+                ScoreReason.PURCHASE,
+                record.time
+            ))
+            event.server.sendPluginMessage(
+                VelocityEndpoint.respChannelId,
+                lxNetFormat.encodeResponse(WithdrawPlayerScoreCall.Response(true, scores - record.score, event.call.id)).toByteArray()
+            )
         }
     }
 
@@ -57,15 +84,17 @@ class RemoteCallHandler(
         // A typical check-then-set doesn't guarantee thread-safe.
         // It's an effort to avoid large queries. There's another check in the underlying implementation
         // to make this operation behaves correctly.
-        if(!ds.hasAchievementBefore(call.player, call.achievementId)){
+        if (!ds.hasAchievementBefore(call.player, call.achievementId)) {
             ds.addAchievement(call.player, call.achievementId)
             // send achievement dialog
             val player = server.getPlayer(call.player).getOrNull() ?: return
             val achievement = Achievements.allAchievements[call.achievementId] ?: return
             achievementPopup(player, achievement)
-            player.sendMessage(MiniMessage.miniMessage().deserialize(
-                "<hover:show_text:'${achievement.description}'><gold> <obf>qwq</obf> >></gold> <dark_green>解锁成就:</dark_green> ${achievement.name} <gold><<  <obf>qwq</obf> </gold></hover>"
-            ))
+            player.sendMessage(
+                MiniMessage.miniMessage().deserialize(
+                    "<hover:show_text:'${achievement.description}'><gold> <obf>qwq</obf> >></gold> <dark_green>解锁成就:</dark_green> ${achievement.name} <gold><<  <obf>qwq</obf> </gold></hover>"
+                )
+            )
         }
         println()
     }

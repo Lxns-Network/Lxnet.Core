@@ -56,3 +56,10 @@ fun itemTemplateAchievement(
 
 
 operator fun ChatColor.plus(str: String): String = this.toString() + str
+
+fun newItem(mat: Material,name: String, vararg lore: String): ItemStack {
+    return ItemStack(mat).withMeta {
+        setDisplayName(name.bukkitColor())
+        this.lore = lore.toMutableList().map { it.bukkitColor() }
+    }
+}

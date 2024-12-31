@@ -4,6 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import net.lxns.core.NoResponse
 import net.lxns.core.RemoteCall
+import net.lxns.core.RemoteResponse
 import net.lxns.core.record.PlayerScoreRecord
 
 @Serializable
