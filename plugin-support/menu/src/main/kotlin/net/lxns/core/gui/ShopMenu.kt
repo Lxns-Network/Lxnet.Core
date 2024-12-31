@@ -158,6 +158,7 @@ class ShopMenu(
             val session = playerSessionMap[player.uniqueId] ?: return@withMeta
             val money = playerMoneyCache[session] ?: STATE_LOADING
             val _lore = ArrayList(lore)
+            _lore.add("&a价格: &e$price")
             if (!requirement(player)) {
                 _lore.add("&c此商品不可再购买！")
             } else {

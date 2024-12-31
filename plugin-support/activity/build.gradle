@@ -1,0 +1,6 @@
+dependencies {
+    compileOnly libs.paper.api
+    compileOnly 'net.citizensnpcs:citizens-main:2.0.37-SNAPSHOT'
+    compileOnly project(":plugin-support:menu")
+    compileOnly project(":paper-common")
+}

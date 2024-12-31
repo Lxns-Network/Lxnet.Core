@@ -33,6 +33,9 @@ allprojects {
             name = 'sonatype'
             url = 'https://oss.sonatype.org/content/groups/public/'
         }
+        maven {
+            url = "https://maven.citizensnpcs.co/repo"
+        }
     }
     dependencies {
         implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3"

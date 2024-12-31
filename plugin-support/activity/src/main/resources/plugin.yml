@@ -1,0 +1,7 @@
+name: Activity
+main: net.lxns.core.ActivityPlugin
+version: 0.1.0
+depend: [LobbyMenu, Lxnet.Core, Citizens]
+commands:
+  testall:
+    description: ""
